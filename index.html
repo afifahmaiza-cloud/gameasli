@@ -113,7 +113,7 @@ h2 {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform .5s;
+  transition: transform .10s;
 }
 
 .card.flipped .card-inner,
@@ -269,7 +269,7 @@ button.action:disabled {
   </div>
 
   <div class="status" id="status">
-    Hafalkan posisi kartu! 5 detik lagi...
+    Hafalkan posisi kartu! 10 detik lagi...
   </div>
 
   <div class="game" id="game"></div>
@@ -294,12 +294,13 @@ button.action:disabled {
 <script>
 
 const methods = [
-  {id: 1, icon: "🍅", name: "Pomodoro"},
-  {id: 2, icon: "🧠", name: "Active Recall"},
-  {id: 3, icon: "📚", name: "Spaced Repetition"},
-  {id: 4, icon: "💡", name: "Feynman"},
-  {id: 5, icon: "📝", name: "Cornell Notes"},
-  {id: 6, icon: "🔄", name: "Interleaved"}
+  {id: 1, icon: "🐪"},
+  {id: 2, icon: "🐫"},
+  {id: 3, icon: "🐏"},
+  {id: 4, icon: "🐏"},
+  {id: 5, icon: "🐐"},
+  {id: 6, icon: "🐋"},
+  {id: 7, icon: "🐳"},
 ];
 
 let cards = [...methods, ...methods]
