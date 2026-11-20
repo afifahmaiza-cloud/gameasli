@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyMatch - Memory Challenge</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eeeeee;
+  color: #333;
+}
+
+header {
+  height: 80px;
+  background: white;
+  display: flex;
+  align-items: center;
+  padding: 0 11%;
+  gap: 35px;
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: #075b83;
+  color: white;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.progress {
+  height: 15px;
+  flex: 1;
+  background: #bddbea;
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 680px;
+  margin: auto;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #1979a9;
+  transition: .3s;
+}
+
+.container {
+  max-width: 1068px;
+  margin: 40px auto;
+  padding: 0 15px;
+}
+
+.activity {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 7px;
+}
+
+h2 {
+  font-size: 23px;
+  font-weight: 500;
+  margin: 0 0 7px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 15px;
+}
+
+.info {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin: 25px 0;
+  font-size: 14px;
+}
+
+.info strong {
+  color: #1979a9;
+}
+
+.game {
+  width: min(100%, 690px);
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+}
+
+.card {
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 17px;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  perspective: 700px;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .5s;
+}
+
+.card.flipped .card-inner,
+.card.matched .card-inner {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 17px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.front {
+  background: #a9cfe2;
+  color: #fff;
+  font-size: 37px;
+  font-weight: bold;
+  border: 3px solid white;
+}
+
+.back {
+  background: white;
+  transform: rotateY(180deg);
+  border: 3px solid #b2d2e1;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.emoji {
+  width: 76px;
+  height: 76px;
+  background: #b3d7e7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.card-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+}
+
+.card.matched .back {
+  background: #d9edf5;
+  border-color: #65a8c8;
+}
+
+.card:disabled {
+  cursor: default;
+}
+
+.status {
+  text-align: center;
+  margin: 20px 0;
+  color: #1979a9;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.bottom {
+  max-width: 1068px;
+  margin: 30px auto;
+  padding: 0 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+button.action {
+  border: none;
+  border-radius: 30px;
+  padding: 13px 35px;
+  background: #1979a9;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button.action:disabled {
+  background: #c9c9c9;
+  cursor: not-allowed;
+}
+
+#result {
+  display: none;
+  text-align: center;
+  padding: 45px 10px;
+}
+
+@media(max-width: 600px) {
+  header {
+    padding: 0 18px;
+    gap: 20px;
+  }
+
+  .container {
+    margin-top: 28px;
+  }
+
+  .game {
+    gap: 8px;
+  }
+
+  .front, .back {
+    border-radius: 11px;
+  }
+
+  .emoji {
+    width: 48px;
+    height: 48px;
+    font-size: 27px;
+  }
+
+  .card-name {
+    font-size: 9px;
+  }
+
+  .info {
+    gap: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="close" onclick="exitGame()">×</button>
+  <div class="progress">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="activity">ACTIVITY 6</div>
+  <h2>Memory Challenge</h2>
+  <p class="subtitle">Remember the cards and find the pairs!</p>
+
+  <div class="info">
+    <div>Time: <strong id="timer">00:00</strong></div>
+    <div>Moves: <strong id="moves">0</strong></div>
+    <div>Pairs: <strong id="pairs">0/6</strong></div>
+  </div>
+
+  <div class="status" id="status">
+    Hafalkan posisi kartu! 5 detik lagi...
+  </div>
+
+  <div class="game" id="game"></div>
+
+  <div id="result">
+    <h1>🎉 Excellent!</h1>
+    <h2>Memory Challenge Completed!</h2>
+    <p id="finalScore"></p>
+    <button class="action" onclick="location.reload()">
+      Play Again
+    </button>
+  </div>
+
+</main>
+
+<div class="bottom">
+  <button class="action" id="restart" onclick="location.reload()">
+    Restart
+  </button>
+</div>
+
+<script>
+
+const methods = [
+  {id: 1, icon: "🍅", name: "Pomodoro"},
+  {id: 2, icon: "🧠", name: "Active Recall"},
+  {id: 3, icon: "📚", name: "Spaced Repetition"},
+  {id: 4, icon: "💡", name: "Feynman"},
+  {id: 5, icon: "📝", name: "Cornell Notes"},
+  {id: 6, icon: "🔄", name: "Interleaved"}
+];
+
+let cards = [...methods, ...methods]
+  .sort(() => Math.random() - 0.5);
+
+let firstCard = null;
+let secondCard = null;
+let lock = true;
+
+let moves = 0;
+let pairs = 0;
+let seconds = 0;
+let timerInterval;
+
+const game = document.getElementById("game");
+
+function createCards() {
+
+  cards.forEach((item, index) => {
+
+    const card = document.createElement("button");
+
+    card.className = "card flipped";
+
+    card.innerHTML = `
+      <div class="card-inner">
+
+        <div class="front">?</div>
+
+        <div class="back">
+          <div class="emoji">${item.icon}</div>
+          <div class="card-name">${item.name}</div>
+        </div>
+
+      </div>
+    `;
+
+    card.dataset.id = item.id;
+
+    card.onclick = () => chooseCard(card);
+
+    game.appendChild(card);
+
+  });
+
+}
+
+function startGame() {
+
+  createCards();
+
+  let countdown = 5;
+
+  const status = document.getElementById("status");
+
+  const preview = setInterval(() => {
+
+    countdown--;
+
+    if (countdown > 0) {
+      status.innerText =
+        "Hafalkan posisi kartu! " + countdown + " detik lagi...";
+    } else {
+
+      clearInterval(preview);
+
+      document.querySelectorAll(".card").forEach(card => {
+        card.classList.remove("flipped");
+      });
+
+      status.innerText = "Cari pasangan kartu yang sama!";
+      lock = false;
+
+      startTimer();
+    }
+
+  }, 1000);
+
+}
+
+function startTimer() {
+
+  timerInterval = setInterval(() => {
+
+    seconds++;
+
+    let min = Math.floor(seconds / 60);
+    let sec = seconds % 60;
+
+    document.getElementById("timer").innerText =
+      String(min).padStart(2, "0") + ":" +
+      String(sec).padStart(2, "0");
+
+  }, 1000);
+
+}
+
+function chooseCard(card) {
+
+  if (
+    lock ||
+    card.classList.contains("flipped") ||
+    card.classList.contains("matched")
+  ) return;
+
+  card.classList.add("flipped");
+
+  if (!firstCard) {
+    firstCard = card;
+    return;
+  }
+
+  secondCard = card;
+  moves++;
+
+  document.getElementById("moves").innerText = moves;
+
+  checkMatch();
+
+}
+
+function checkMatch() {
+
+  lock = true;
+
+  if (firstCard.dataset.id === secondCard.dataset.id) {
+
+    firstCard.classList.add("matched");
+    secondCard.classList.add("matched");
+
+    pairs++;
+
+    document.getElementById("pairs").innerText =
+      pairs + "/6";
+
+    document.getElementById("progress").style.width =
+      (pairs / 6 * 100) + "%";
+
+    resetCards();
+
+    if (pairs === 6) {
+      endGame();
+    }
+
+  } else {
+
+    setTimeout(() => {
+
+      firstCard.classList.remove("flipped");
+      secondCard.classList.remove("flipped");
+
+      resetCards();
+
+    }, 850);
+
+  }
+
+}
+
+function resetCards() {
+
+  firstCard = null;
+  secondCard = null;
+  lock = false;
+
+}
+
+function endGame() {
+
+  clearInterval(timerInterval);
+
+  document.getElementById("status").innerText =
+    "All pairs found!";
+
+  document.getElementById("game").style.display = "none";
+  document.querySelector(".info").style.display = "none";
+  document.getElementById("result").style.display = "block";
+
+  document.getElementById("finalScore").innerText =
+    "Waktu: " +
+    document.getElementById("timer").innerText +
+    " | Total percobaan: " + moves;
+
+}
+
+function exitGame() {
+
+  if (confirm("Yakin ingin keluar dari permainan?")) {
+    location.reload();
+  }
+
+}
+
+startGame();
+
+</script>
+
+</body>
+</html>
